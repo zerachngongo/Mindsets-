@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<title>Motiva+ | Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Montserrat',sans-serif;min-height:100vh;transition:0.3s;background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);color:#fff;}
+body.light{background:linear-gradient(135deg,#f5f7fa,#c3cfe2);color:#111;}
+header{padding:20px;text-align:center;backdrop-filter:blur(12px);}
+.logo{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;background:linear-gradient(45deg,#4facfe,#00f2fe);-webkit-background-clip:text;color:transparent;}
+nav a, button{margin:0 10px;text-decoration:none;color:inherit;font-weight:600;cursor:pointer;padding:8px 12px;border:none;border-radius:6px;background:#00f2fe;box-shadow:0 0 10px #00f2fe,0 0 20px #43e97b;transition:0.3s;}
+nav a:hover, button:hover{transform:scale(1.05);box-shadow:0 0 25px #00f2fe,0 0 50px #43e97b;}
+.container{padding:20px;}
+.card{background:rgba(255,255,255,0.12);padding:20px;border-radius:20px;backdrop-filter:blur(14px);margin-bottom:20px;transition:0.3s;}
+body.light .card{background:rgba(255,255,255,0.8);}
+input,textarea{width:80%;padding:8px;margin:5px 0;border-radius:6px;border:none;}
+.btn{padding:8px 15px;border:none;border-radius:6px;background:#00f2fe;font-weight:bold;margin:5px;cursor:pointer;}
+.btn:hover{box-shadow:0 0 25px #00f2fe,0 0 50px #43e97b;}
+table{width:100%;border-collapse:collapse;}
+th,td{padding:8px;border:1px solid #fff;text-align:center;}
+canvas{background:rgba(255,255,255,0.1);border-radius:12px;margin-top:15px;}
+</style>
+</head>
+<body>
+
+<header>
+<div class="logo">Motiva+ Admin</div>
+<nav>
+<a href="index.html">Accueil</a>
+<a href="generator.html">Générateur</a>
+<button onclick="toggleTheme()">🌙/☀️</button>
+</nav>
+</header>
+
+<div class="container" id="adminContainer">
+
+<!-- Connexion Admin -->
+<div class="card" id="loginCard">
+<h2>🔐 Connexion Admin</h2>
+<input type="password" id="pass" placeholder="Mot de passe admin">
+<button class="btn" onclick="checkPass()">Se connecter</button>
+<p id="loginMsg"></p>
+</div>
+
+<!-- Dashboard -->
+<div id="dashboard" style="display:none;">
+
+<h2>📊 Dashboard Admin</h2>
+
+<div class="card">
+<h3>Ajouter une citation</h3>
+<input type="text" id="newQuote" placeholder="Nouvelle citation">
+<input type="text" id="newAuthor" placeholder="Nom de l'auteur">
+<button class="btn" onclick="addQuote()">Ajouter</button>
+</div>
+
+<div class="card">
+<h3>Toutes les citations</h3>
+<table id="quoteTable">
+<tr><th>#</th><th>Citation</th><th>Auteur</th><th>Vues</th><th>Réactions</th><th>Actions</th></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>Graphique des vues</h3>
+<canvas id="chartVues" width="400" height="200"></canvas>
+</div>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Initialisation
+let quotes = JSON.parse(localStorage.getItem("quotes")) || [
+  {text:"Travaille dur, rêve grand.", author:"Zerach"},
+  {text:"Ne lâche jamais.", author:"Nelson Mandela"},
+  {text:"Ta discipline est ta force.", author:"Confucius"},
+  {text:"Le succès est une décision.", author:"Tony Robbins"},
+  {text:"Continue jusqu’au sommet.", author:"Les Brown"},
+  {text:"Chaque jour compte.", author:"John C. Maxwell"},
+  {text:"Crois en toi.", author:"Eleanor Roosevelt"},
+  {text:"Rien n’est impossible.", author:"Albert Einstein"},
+  {text:"Transforme tes rêves en plans.", author:"Napoleon Hill"},
+  {text:"Fais-le maintenant.", author:"Unknown"}
+];
+let stats = JSON.parse(localStorage.getItem("stats")) || Array(quotes.length).fill(0);
+let reactions = JSON.parse(localStorage.getItem("reactions")) || quotes.map(()=>({"👍":0,"❤️":0,"😯":0,"🥺":0,"👏":0,"🧠":0,"💔":0}));
+
+localStorage.setItem("quotes",JSON.stringify(quotes));
+localStorage.setItem("stats",JSON.stringify(stats));
+localStorage.setItem("reactions",JSON.stringify(reactions));
+
+// Mode sombre/clair
+function toggleTheme(){
+  document.body.classList.toggle("light");
+  localStorage.setItem("theme",document.body.classList.contains("light")?"light":"dark");
+}
+if(localStorage.getItem("theme")==="light"){document.body.classList.add("light");}
+
+// Connexion Admin
+function checkPass(){
+  const p = document.getElementById("pass").value;
+  if(p==="motiva2026"){
+    document.getElementById("loginCard").style.display="none";
+    document.getElementById("dashboard").style.display="block";
+    showTable(); updateChart();
+  } else {
+    document.getElementById("loginMsg").innerText="❌ Mot de passe incorrect";
+  }
+}
+
+// Ajouter citation
+function addQuote(){
+  const q = document.getElementById("newQuote").value.trim();
+  const a = document.getElementById("newAuthor").value.trim();
+  if(!q || !a) return;
+  quotes.push({text:q, author:a});
+  stats.push(0);
+  reactions.push({"👍":0,"❤️":0,"😯":0,"🥺":0,"👏":0,"🧠":0,"💔":0});
+  localStorage.setItem("quotes",JSON.stringify(quotes));
+  localStorage.setItem("stats",JSON.stringify(stats));
+  localStorage.setItem("reactions",JSON.stringify(reactions));
+  document.getElementById("newQuote").value=""; document.getElementById("newAuthor").value="";
+  showTable(); updateChart();
+}
+
+// Tableau citations
+function showTable(){
+  let table=document.getElementById("quoteTable");
+  table.innerHTML='<tr><th>#</th><th>Citation</th><th>Auteur</th><th>Vues</th><th>Réactions</th><th>Actions</th></tr>';
+  quotes.forEach((q,i)=>{
+    let reactStr = Object.entries(reactions[i]).map(e=>`${e[0]}:${e[1]}`).join(" ");
+    table.innerHTML += `<tr>
+      <td>${i+1}</td>
+      <td><input type="text" value="${q.text}" id="q${i}"></td>
+      <td><input type="text" value="${q.author}" id="a${i}"></td>
+      <td>${stats[i]}</td>
+      <td>${reactStr}</td>
+      <td>
+      <button class="btn" onclick="updateQuote(${i})">Modifier</button>
+      <button class="btn" onclick="deleteQuote(${i})">Supprimer</button>
+      </td>
+    </tr>`;
+  });
+}
+
+function updateQuote(i){
+  const text = document.getElementById("q"+i).value;
+  const author = document.getElementById("a"+i).value;
+  quotes[i] = {text:text, author:author};
+  localStorage.setItem("quotes",JSON.stringify(quotes));
+  showTable(); updateChart();
+}
+
+function deleteQuote(i){
+  quotes.splice(i,1); stats.splice(i,1); reactions.splice(i,1);
+  localStorage.setItem("quotes",JSON.stringify(quotes));
+  localStorage.setItem("stats",JSON.stringify(stats));
+  localStorage.setItem("reactions",JSON.stringify(reactions));
+  showTable(); updateChart();
+}
+
+// Graphique vues
+let chart;
+function updateChart(){
+  let ctx=document.getElementById("chartVues").getContext('2d');
+  if(chart) chart.destroy();
+  chart=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:quotes.map(q=>q.text),
+      datasets:[{label:'Vues',data:stats,backgroundColor:'rgba(0,242,254,0.6)'}]
+    },
+    options:{responsive:true,plugins:{legend:{display:false}}}
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motiva+ | À propos</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Montserrat',sans-serif;min-height:100vh;transition:0.3s;background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);color:#fff;}
+body.light{background:linear-gradient(135deg,#f5f7fa,#c3cfe2);color:#111;}
+header{padding:20px;text-align:center;backdrop-filter:blur(12px);}
+.logo{font-family:'Playfair Display',serif;font-size:42px;font-weight:700;background:linear-gradient(45deg,#4facfe,#00f2fe);-webkit-background-clip:text;color:transparent;}
+nav a{margin:0 12px;text-decoration:none;color:inherit;font-weight:600;}
+.container{padding:20px;text-align:center;}
+.card{background:rgba(255,255,255,0.12);padding:30px;border-radius:20px;margin:20px auto;max-width:700px;backdrop-filter:blur(14px);}
+body.light .card{background:rgba(255,255,255,0.8);}
+.btn{margin-top:20px;padding:12px 25px;border:none;border-radius:25px;background:linear-gradient(45deg,#4facfe,#00f2fe);color:#fff;font-weight:600;cursor:pointer;transition:0.3s;box-shadow:0 4px 15px rgba(0,242,254,0.3);}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,242,254,0.5);}
+#themeBtn{position:absolute;top:25px;right:25px;padding:10px;border:none;border-radius:50%;cursor:pointer;background:#00f2fe;color:#fff;font-size:18px;box-shadow:0 0 15px rgba(0,242,254,0.4);}
+#themeBtn:hover{box-shadow:0 0 25px rgba(0,242,254,0.7);}
+</style>
+</head>
+
+<body>
+<header>
+<div class="logo">Motiva+</div>
+<button id="themeBtn" onclick="toggleTheme()">🌙</button>
+<nav>
+<a href="index.html">Accueil</a>
+<a href="about.html">À propos</a>
+<a href="generator.html">Générer une citation</a>
+<a href="admin.html">Admin</a>
+</nav>
+</header>
+
+<div class="container">
+
+<div class="card">
+<h2>🌟 À propos de Motiva+</h2>
+<p>Motiva+ est une plateforme innovante dédiée à la motivation et à l’inspiration quotidienne. Ici, tu trouveras des citations puissantes avec leur auteur, tu pourras réagir avec tes emojis préférés et partager ces citations avec tes amis pour diffuser l’inspiration !</p>
+
+<p>Chaque jour est une opportunité de se rapprocher de ses objectifs. Garde ton énergie positive et transforme tes obstacles en réussites.</p>
+
+<p>Clique sur le bouton ci-dessous pour commencer à générer des citations et te laisser inspirer !</p>
+
+<button class="btn" onclick="goGenerator()">Générer une citation →</button>
+</div>
+
+</div>
+
+<footer>
+© 2026 Motiva+ | Projet académique
+</footer>
+
+<script>
+function toggleTheme(){
+  document.body.classList.toggle("light");
+  localStorage.setItem("theme",document.body.classList.contains("light")?"light":"dark");
+}
+if(localStorage.getItem("theme")==="light"){document.body.classList.add("light");}
+
+function goGenerator(){window.location.href="generator.html";}
+</script>
+</body>
+</html>

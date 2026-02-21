@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motiva+ | Accueil</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Montserrat',sans-serif;min-height:100vh;display:flex;flex-direction:column;transition:0.3s;
+background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);color:#fff;}
+body.light{background:linear-gradient(135deg,#f5f7fa,#c3cfe2);color:#111;}
+header{padding:20px;text-align:center;backdrop-filter:blur(12px);}
+.logo{font-family:'Playfair Display',serif;font-size:42px;font-weight:700;background:linear-gradient(45deg,#4facfe,#00f2fe);-webkit-background-clip:text;color:transparent;}
+.container{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:20px;}
+.hero{font-size:28px;margin-bottom:20px;line-height:1.5;animation:fade 1s ease;}
+.card{background:rgba(255,255,255,0.12);backdrop-filter:blur(14px);padding:30px;border-radius:20px;max-width:700px;width:100%;transition:0.3s;}
+.btn{margin-top:20px;padding:12px 25px;border:none;border-radius:25px;background:linear-gradient(45deg,#4facfe,#00f2fe);color:#fff;font-weight:600;cursor:pointer;transition:0.3s;box-shadow:0 4px 15px rgba(0,242,254,0.3);}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,242,254,0.5);}
+#themeBtn{position:absolute;top:25px;right:25px;padding:10px;border:none;border-radius:50%;cursor:pointer;background:#00f2fe;color:#fff;font-size:18px;box-shadow:0 0 15px rgba(0,242,254,0.4);}
+#themeBtn:hover{box-shadow:0 0 25px rgba(0,242,254,0.7);}
+footer{text-align:center;padding:10px;font-size:13px;opacity:0.8;}
+@keyframes fade{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="logo">Motiva+</div>
+<button id="themeBtn" onclick="toggleTheme()">🌙</button>
+</header>
+
+<div class="container">
+
+<div class="card">
+<div class="hero">
+✨ Inspire-toi chaque jour et construis ton avenir aujourd’hui.  
+Motiva+ te donne des citations puissantes et des conseils pour rester discipliné et motivé. 💪🔥
+</div>
+
+<p>Chaque journée est une opportunité. Commence maintenant et deviens la meilleure version de toi-même.</p>
+
+<button class="btn" onclick="goAbout()">
+Découvrir le projet →
+</button>
+</div>
+
+</div>
+
+<footer>
+© 2026 Motiva+ | Projet académique
+</footer>
+
+<script>
+function toggleTheme(){
+  document.body.classList.toggle("light");
+  localStorage.setItem("theme",document.body.classList.contains("light")?"light":"dark");
+}
+if(localStorage.getItem("theme")==="light"){document.body.classList.add("light");}
+
+function goAbout(){window.location.href="about.html";}
+</script>
+
+</body>
+</html>

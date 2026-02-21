@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<title>Motiva+ | Contact</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Montserrat',sans-serif;min-height:100vh;background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);color:#fff;transition:0.3s;}
+body.light{background:linear-gradient(135deg,#f5f7fa,#c3cfe2);color:#111;}
+header{padding:20px;text-align:center;backdrop-filter:blur(12px);}
+.logo{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;background:linear-gradient(45deg,#4facfe,#00f2fe);-webkit-background-clip:text;color:transparent;}
+nav a, .btn{margin:0 10px;text-decoration:none;color:inherit;font-weight:600;cursor:pointer;}
+.container{padding:20px;display:flex;flex-direction:column;align-items:center;}
+.card{background:rgba(255,255,255,0.12);padding:25px;border-radius:20px;margin:20px 0;width:90%;max-width:600px;backdrop-filter:blur(14px);transition:0.3s;}
+body.light .card{background:rgba(255,255,255,0.8);}
+input,textarea{width:80%;padding:10px;margin:8px 0;border-radius:8px;border:none;}
+.btn{padding:10px 18px;border:none;border-radius:20px;background:linear-gradient(45deg,#4facfe,#00f2fe);color:#fff;font-weight:600;cursor:pointer;transition:0.3s;}
+.btn:hover{transform:translateY(-2px);box-shadow:0 0 25px rgba(0,242,254,0.5);}
+#themeBtn{position:absolute;top:25px;right:25px;padding:10px;border:none;border-radius:50%;cursor:pointer;background:#00f2fe;color:#fff;font-size:18px;box-shadow:0 0 15px rgba(0,242,254,0.4);}
+#themeBtn:hover{box-shadow:0 0 25px rgba(0,242,254,0.7);}
+.messageBox{background:rgba(255,255,255,0.1);padding:10px;margin:5px 0;border-radius:10px;}
+body.light .messageBox{background:rgba(200,200,200,0.4);color:#111;}
+.replyBox{margin-top:5px;}
+</style>
+</head>
+<body>
+
+<header>
+<div class="logo">Motiva+</div>
+<button id="themeBtn" onclick="toggleTheme()">🌙</button>
+<nav>
+<a href="index.html">Accueil</a>
+<a href="generator.html">Générateur</a>
+<a href="about.html">À propos</a>
+<a href="contact.html">Contact</a>
+<a href="admin.html">Admin</a>
+</nav>
+</header>
+
+<div class="container">
+<div class="card">
+<h2>📩 Contact</h2>
+<p>Envoie-nous un message ou partage une idée :</p>
+<form id="contactForm">
+<input type="text" id="name" placeholder="Ton nom" required><br>
+<input type="email" id="email" placeholder="Ton email" required><br>
+<textarea id="message" rows="4" placeholder="Ton message" required></textarea><br>
+<button class="btn" type="submit">Envoyer 💌</button>
+</form>
+<p>Ou contacte-nous directement via <a href="https://wa.me/+243859790094" style="color:#00f2fe;">WhatsApp</a></p>
+</div>
+
+<div class="card" id="messagesCard">
+<h3>📬 Messages reçus</h3>
+<div id="messagesList"></div>
+</div>
+</div>
+
+<script>
+// Mode sombre/clair
+function toggleTheme(){
+  document.body.classList.toggle("light");
+  localStorage.setItem("theme",document.body.classList.contains("light")?"light":"dark");
+}
+if(localStorage.getItem("theme")==="light"){document.body.classList.add("light");}
+
+// Messages + réponses
+let messages = JSON.parse(localStorage.getItem("messages")) || [];
+
+function displayMessages(){
+  const list = document.getElementById("messagesList");
+  list.innerHTML="";
+  messages.forEach((m,i)=>{
+    const div = document.createElement("div");
+    div.className="messageBox";
+    div.innerHTML=`<strong>${m.name} (${m.email})</strong><p>${m.text}</p>
+      ${m.reply?`<p style="color:#00f2fe;">Réponse: ${m.reply}</p>`:''}
+      <div class="replyBox">
+        <input type="text" id="reply${i}" placeholder="Répondre..." style="width:70%">
+        <button class="btn" onclick="sendReply(${i})">Répondre</button>
+      </div>`;
+    list.appendChild(div);
+  });
+}
+displayMessages();
+
+document.getElementById("contactForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const text = document.getElementById("message").value.trim();
+  if(!name || !email || !text) return;
+
+  messages.push({name,email,text,reply:""});
+  localStorage.setItem("messages",JSON.stringify(messages));
+  displayMessages();
+  alert("✅ Message envoyé !");
+  this.reset();
+
+  // mail client optionnel
+  window.location.href = `mailto:tonmail@example.com?subject=Message de ${name}&body=${encodeURIComponent(text)}`;
+});
+
+// Envoyer une réponse
+function sendReply(i){
+  const val = document.getElementById("reply"+i).value.trim();
+  if(!val) return;
+  messages[i].reply = val;
+  localStorage.setItem("messages",JSON.stringify(messages));
+  alert("✅ Réponse envoyée !");
+  displayMessages();
+}
+</script>
+</body>
+</html>

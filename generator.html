@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Motiva+ | Générateur de citations</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Montserrat',sans-serif;min-height:100vh;background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);color:#fff;display:flex;flex-direction:column;transition:0.3s;}
+body.light{background:linear-gradient(135deg,#f5f7fa,#c3cfe2);color:#111;}
+header{padding:20px;text-align:center;backdrop-filter:blur(12px);}
+.logo{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;background:linear-gradient(45deg,#4facfe,#00f2fe);-webkit-background-clip:text;color:transparent;}
+nav a, .btn{margin:0 10px;text-decoration:none;color:inherit;font-weight:600;cursor:pointer;}
+.container{flex:1;display:flex;flex-direction:column;align-items:center;padding:20px;}
+.card{background:rgba(255,255,255,0.12);padding:30px;border-radius:20px;margin:20px 0;width:90%;max-width:600px;text-align:center;backdrop-filter:blur(14px);transition:0.3s;}
+body.light .card{background:rgba(255,255,255,0.8);}
+#quoteText{font-size:22px;font-family:'Playfair Display',serif;margin-bottom:15px;}
+#quoteAuthor{font-size:18px;font-style:italic;color:#f0f0f0;margin-bottom:15px;}
+body.light #quoteAuthor{color:#333;}
+.btn{padding:12px 25px;border:none;border-radius:25px;background:linear-gradient(45deg,#4facfe,#00f2fe);color:#fff;font-weight:600;cursor:pointer;transition:0.3s;box-shadow:0 4px 15px rgba(0,242,254,0.3);}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,242,254,0.5);}
+.reactions button{margin:5px;}
+#themeBtn{position:absolute;top:25px;right:25px;padding:10px;border:none;border-radius:50%;cursor:pointer;background:#00f2fe;color:#fff;font-size:18px;box-shadow:0 0 15px rgba(0,242,254,0.4);}
+#themeBtn:hover{box-shadow:0 0 25px rgba(0,242,254,0.7);}
+.share{margin-top:15px;}
+.share button{margin:0 5px;}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="logo">Motiva+</div>
+<button id="themeBtn" onclick="toggleTheme()">🌙</button>
+<nav>
+<a href="index.html">Accueil</a>
+<a href="about.html">À propos</a>
+<a href="generator.html">Générateur</a>
+<a href="admin.html">Admin</a>
+</nav>
+</header>
+
+<div class="container">
+<div class="card" id="quoteCard">
+<div id="quoteText">Clique sur Générer pour obtenir une citation inspirante</div>
+<div id="quoteAuthor"></div>
+<div class="reactions" id="reactionsBox"></div>
+<div class="share">
+<button class="btn" onclick="shareWA()">Partager WhatsApp</button>
+<button class="btn" onclick="shareFB()">Partager Facebook</button>
+</div>
+<button class="btn" onclick="generateQuote()">Générer une citation 🔀</button>
+</div>
+</div>
+
+<script>
+const siteURL = "https://ton-site.github.io"; // CHANGE pour ton GitHub Pages
+
+// Citations initiales avec auteurs
+let quotes = [
+  {text:"Travaille dur, rêve grand.", author:"Zerach"},
+  {text:"Ne lâche jamais.", author:"Nelson Mandela"},
+  {text:"Ta discipline est ta force.", author:"Confucius"},
+  {text:"Le succès est une décision.", author:"Tony Robbins"},
+  {text:"Continue jusqu’au sommet.", author:"Les Brown"},
+  {text:"Chaque jour compte.", author:"John C. Maxwell"},
+  {text:"Crois en toi.", author:"Eleanor Roosevelt"},
+  {text:"Rien n’est impossible.", author:"Albert Einstein"},
+  {text:"Transforme tes rêves en plans.", author:"Napoleon Hill"},
+  {text:"Fais-le maintenant.", author:"Unknown"}
+];
+
+// Stats et réactions
+let stats = JSON.parse(localStorage.getItem("stats")) || Array(quotes.length).fill(0);
+let reactions = JSON.parse(localStorage.getItem("reactions")) || quotes.map(()=>({"👍":0,"❤️":0,"😯":0,"🥺":0,"👏":0,"🧠":0,"💔":0}));
+
+let lastShown = JSON.parse(localStorage.getItem("lastShown")) || {};
+let lastReacted = JSON.parse(localStorage.getItem("lastReacted")) || {};
+
+localStorage.setItem("stats",JSON.stringify(stats));
+localStorage.setItem("reactions",JSON.stringify(reactions));
+
+// Mode sombre/clair
+function toggleTheme(){
+  document.body.classList.toggle("light");
+  localStorage.setItem("theme",document.body.classList.contains("light")?"light":"dark");
+}
+if(localStorage.getItem("theme")==="light"){document.body.classList.add("light");}
+
+// Générer citation aléatoire avec limite 1/jour
+function generateQuote(){
+  let available = quotes.map((q,i)=>i).filter(i=>{
+    const today = new Date().toDateString();
+    return lastShown[i] !== today;
+  });
+  if(available.length===0){
+    alert("Toutes les citations ont été affichées aujourd'hui. Reviens demain !");
+    return;
+  }
+  let idx = available[Math.floor(Math.random()*available.length)];
+  displayQuote(idx);
+  const today = new Date().toDateString();
+  lastShown[idx] = today;
+  localStorage.setItem("lastShown",JSON.stringify(lastShown));
+  stats[idx]++;
+  localStorage.setItem("stats",JSON.stringify(stats));
+}
+
+function displayQuote(i){
+  document.getElementById("quoteText").innerText = quotes[i].text;
+  document.getElementById("quoteAuthor").innerText = "— "+quotes[i].author;
+  // changement aléatoire background
+  const colors = ["#4facfe","#00f2fe","#43e97b","#fa709a","#f46b45","#ee0979"];
+  document.getElementById("quoteCard").style.background = `linear-gradient(135deg, ${colors[Math.floor(Math.random()*colors.length)]}, ${colors[Math.floor(Math.random()*colors.length)]})`;
+  // mettre reactions
+  const box = document.getElementById("reactionsBox");
+  box.innerHTML = "";
+  for(let r in reactions[i]){
+    let btn = document.createElement("button");
+    btn.innerText = `${r} ${reactions[i][r]}`;
+    btn.className="btn";
+    btn.onclick = ()=>{
+      const today = new Date().toDateString();
+      if(!lastReacted[i]) lastReacted[i]={};
+      if(lastReacted[i][r]===today){
+        alert("Tu as déjà réagi avec cet emoji aujourd'hui !");
+        return;
+      }
+      reactions[i][r]++;
+      localStorage.setItem("reactions",JSON.stringify(reactions));
+      lastReacted[i][r]=today;
+      localStorage.setItem("lastReacted",JSON.stringify(lastReacted));
+      displayQuote(i);
+    };
+    box.appendChild(btn);
+  }
+}
+
+function shareWA(){
+  const text = document.getElementById("quoteText").innerText + " — " + document.getElementById("quoteAuthor").innerText + "\n" + siteURL;
+  window.open("https://wa.me/?text="+encodeURIComponent(text));
+}
+
+function shareFB(){
+  const text = document.getElementById("quoteText").innerText + " — " + document.getElementById("quoteAuthor").innerText;
+  window.open("https://www.facebook.com/sharer/sharer.php?u="+encodeURIComponent(siteURL)+"&quote="+encodeURIComponent(text));
+}
+</script>
+</body>
+</html>
